@@ -18,6 +18,7 @@ The examples folder contains example solutions across a variety of Google Cloud 
 * [CloudML Bee Health Detection](examples/cloudml-bee-health-detection) - Detect if a bee is unhealthy based on an image of it and its subspecies.
 * [CloudML Churn Prediction](examples/cloudml-churn-prediction) - Predict users' propensity to churn using Survival Analysis.
 * [CloudML Deep Collaborative Filtering](examples/cloudml-collaborative-filtering) - Recommend songs given either a user or song.
+* [Cloud ML Document Understanding](examples/cloudml-document-understanding) - Categorizing and parsing data from US and EU Patents.
 * [CloudML Energy Price Forecasting](examples/cloudml-energy-price-forecasting) - Predicting the future energy price based on historical price and weather.
 * [CloudML Fraud Detection](examples/cloudml-fraud-detection) - Fraud detection model for credit-cards transactions.
 * [CloudML Sentiment Analysis](examples/cloudml-sentiment-analysis) - Sentiment analysis for movie reviews using TensorFlow `RNNEstimator`.
@@ -70,7 +71,6 @@ The tools folder contains ready-made utilities which can simpilfy Google Cloud P
 * [Maven Archetype Dataflow](tools/maven-archetype-dataflow) - A maven archetype which bootstraps a Dataflow project with common plugins pre-configured to help maintain high code quality.
 * [Netblock Monitor](tools/netblock-monitor) - An Apps Script project that will automatically provide email notifications when changes are made to Google’s IP ranges.
 * [Site Verification Group Sync](tools/site-verification-group-sync) - A tool to provision "verified owner" permissions (to create GCS buckets with custom dns) based on membership of a Google Group.
-
 
 ## Contributing
 See the contributing [instructions](/CONTRIBUTING.md) to get started contributing.
