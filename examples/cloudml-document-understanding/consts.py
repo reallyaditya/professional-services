@@ -1,0 +1,5 @@
+PROJECT_ID = "pdf-processing-219114"
+REGION = ""
+DATASET_ID = "patent_demo_data_pdp"
+INPUT_BUCKET = "patent_demo_data_pdp"
+OUTPUT_BUCKET = "patent_demo_data_pdp"

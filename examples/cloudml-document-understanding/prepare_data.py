@@ -93,12 +93,3 @@ def get_data_from_bq(project_id, dataset_id, output_bucket_name):
             "pdf": "png"
         })
         df.to_csv(destination_uri)
-
-
-def main():
-
-    project_id = "customer_project"
-    dataset_id = "patent_demo_data_pdp"
-    output_bucket_name = f"{project_id}-vcm"
-
-    get_data_from_bq(project_id, dataset_id, output_bucket_name)
