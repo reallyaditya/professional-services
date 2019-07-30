@@ -15,9 +15,8 @@
 # limitations under the License.
 
 import os
-import shutil
+import consts
 
-import numpy as np
 import pandas as pd
 
 from google.cloud import bigquery, storage
@@ -37,6 +36,10 @@ def convert_all(input_bucket_name, output_bucket_name):
     input_bucket = client.get_bucket(input_bucket_name)
     output_bucket = client.get_bucket(output_bucket_name)
 
+    # Create temp directory & all intermediate directories
+    if not os.path.exists(consts.TEMP_DIRECTORY):
+        os.makedirs(consts.TEMP_DIRECTORY)
+
     for blob in client.list_blobs(input_bucket):
         if (blob.name.endswith('.pdf')):
 
@@ -44,52 +47,59 @@ def convert_all(input_bucket_name, output_bucket_name):
             png_basename = pdf_basename.replace('.pdf', '.png')
 
             # Download the file to a local temp directory to convert
-            temp_directory = "/tmp/google/"
-            temp_pdf = os.path.join(temp_directory, pdf_basename)
-            temp_png = os.path.join(temp_directory, png_basename)
+            temp_pdf = os.path.join(consts.TEMP_DIRECTORY, pdf_basename)
+            temp_png = os.path.join(consts.TEMP_DIRECTORY, png_basename)
 
+            print(f"Downloading {pdf_basename}")
             input_bucket.get_blob(pdf_basename).download_to_filename(temp_pdf)
 
             # Convert PDF to PNG
+            print(f"Converting to PNG")
             with Image(filename=temp_pdf, resolution=300) as pdf:
                 with pdf.convert('png') as png:
                     png.save(filename=temp_png)
 
             # Upload to GCS Bucket
+            print(f"Uploading to Cloud Storage")
             output_bucket.blob(png_basename).upload_from_filename(temp_png)
 
-            # Delete the entire temporary directory
-            shutil.rmtree(temp_directory)
+            # Remove Temp files, Don't want to fill up our local storage
+            print(f"Deleting temporary files\n")
+            os.remove(temp_pdf)
+            os.remove(temp_png)
 
+    # Delete the entire temporary directory
+    os.rmdir(consts.TEMP_DIRECTORY)
 # Maybe Write Code to Copy from PDP to Customer Project?
 
 
-def get_data_from_bq(project_id, dataset_id, output_bucket_name):
+def get_data_from_bq(project_id, dataset_id, input_bucket_name, output_bucket_name):
     """Fetches Data From BQ Dataset, uploads CSV to Cloud Storage Bucket
 
     Args:
       project_id (string): Project where dataset is stored
       dataset_id (string): Dataset ID
+      input_bucket_name (string): Bucket with PDF files to convert
       output_bucket_name (string): Bucket for Converted PNGs and CSV
     """
 
-    client = bigquery.Client()
+    client = bigquery.Client(project_id)
 
-    input_bucket_name = "patent_demo_data_pdp"  # Get Bucket Name From PDP
-
-    convert_all(input_bucket_name, output_bucket_name)
+    # convert_all(input_bucket_name, output_bucket_name)
 
     # Extract Table Data into CSV
-    for table_ref in client.list_tables(dataset_id, default_project=project_id):
+    for table_ref in client.list_tables(dataset_id):
 
         destination_uri = f"gs://{output_bucket_name}/{table_ref.table_id}.csv"
 
         table = client.get_table(table_ref)
 
         # Download CSV to change links to new bucket and pdf to png
+        print(f"Processing {table_ref.table_id}")
         df = client.list_rows(table).to_dataframe()
         df.replace({
             input_bucket_name: output_bucket_name,
-            "pdf": "png"
-        })
+            ".pdf": ".png"
+        }, regex=True, inplace=True)
+
         df.to_csv(destination_uri)

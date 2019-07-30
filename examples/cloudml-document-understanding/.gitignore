@@ -1,2 +1,2 @@
-examples/cloudml-document-understanding/keys/key.json
-.vscode
+settings.json
+service-acct.json
