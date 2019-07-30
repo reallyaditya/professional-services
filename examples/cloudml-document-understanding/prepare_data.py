@@ -15,20 +15,21 @@
 # limitations under the License.
 
 import os
-import consts
-
 import pandas as pd
 
 from google.cloud import bigquery, storage
 from wand.image import Image
 
+# TODO Maybe Write Code to Copy Data from PDP to Project BigQuery?
 
-def convert_all(input_bucket_name, output_bucket_name):
+
+def convert_pdfs(input_bucket_name, output_bucket_name, temp_directory):
     """Converts all pdfs in a bucket to png.
 
     Args:
       input_bucket_name (string): Bucket of Public PDFs
       output_bucket_name (string): Bucket for Converted PNGs
+      temp_directory (string): Temporary Local Directory for coversion
     """
 
     # Get Images from Public Bucket
@@ -37,8 +38,8 @@ def convert_all(input_bucket_name, output_bucket_name):
     output_bucket = client.get_bucket(output_bucket_name)
 
     # Create temp directory & all intermediate directories
-    if not os.path.exists(consts.TEMP_DIRECTORY):
-        os.makedirs(consts.TEMP_DIRECTORY)
+    if not os.path.exists(temp_directory):
+        os.makedirs(temp_directory)
 
     for blob in client.list_blobs(input_bucket):
         if (blob.name.endswith('.pdf')):
@@ -47,8 +48,8 @@ def convert_all(input_bucket_name, output_bucket_name):
             png_basename = pdf_basename.replace('.pdf', '.png')
 
             # Download the file to a local temp directory to convert
-            temp_pdf = os.path.join(consts.TEMP_DIRECTORY, pdf_basename)
-            temp_png = os.path.join(consts.TEMP_DIRECTORY, png_basename)
+            temp_pdf = os.path.join(temp_directory, pdf_basename)
+            temp_png = os.path.join(temp_directory, png_basename)
 
             print(f"Downloading {pdf_basename}")
             input_bucket.get_blob(pdf_basename).download_to_filename(temp_pdf)
@@ -69,11 +70,10 @@ def convert_all(input_bucket_name, output_bucket_name):
             os.remove(temp_png)
 
     # Delete the entire temporary directory
-    os.rmdir(consts.TEMP_DIRECTORY)
-# Maybe Write Code to Copy from PDP to Customer Project?
+    os.rmdir(temp_directory)
 
 
-def get_data_from_bq(project_id, dataset_id, input_bucket_name, output_bucket_name):
+def bq_to_csv(project_id, dataset_id, input_bucket_name, output_bucket_name):
     """Fetches Data From BQ Dataset, uploads CSV to Cloud Storage Bucket
 
     Args:
@@ -84,8 +84,6 @@ def get_data_from_bq(project_id, dataset_id, input_bucket_name, output_bucket_na
     """
 
     client = bigquery.Client(project_id)
-
-    # convert_all(input_bucket_name, output_bucket_name)
 
     # Extract Table Data into CSV
     for table_ref in client.list_tables(dataset_id):
@@ -102,4 +100,4 @@ def get_data_from_bq(project_id, dataset_id, input_bucket_name, output_bucket_na
             ".pdf": ".png"
         }, regex=True, inplace=True)
 
-        df.to_csv(destination_uri)
+        df.to_csv(destination_uri, index=False)
