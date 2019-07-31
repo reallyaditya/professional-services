@@ -85,10 +85,14 @@ def bq_to_csv(project_id, dataset_id, input_bucket_name, output_bucket_name):
 
     client = bigquery.Client(project_id)
 
+    csv_uris = []
+
     # Extract Table Data into CSV
     for table_ref in client.list_tables(dataset_id):
 
         destination_uri = f"gs://{output_bucket_name}/{table_ref.table_id}.csv"
+
+        csv_uris.append(destination_uri)
 
         table = client.get_table(table_ref)
 
@@ -101,3 +105,5 @@ def bq_to_csv(project_id, dataset_id, input_bucket_name, output_bucket_name):
         }, regex=True, inplace=True)
 
         df.to_csv(destination_uri, index=False)
+
+    return csv_uris

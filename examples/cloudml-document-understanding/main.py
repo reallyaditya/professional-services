@@ -19,10 +19,10 @@ import prepare_data
 import init_automl
 
 # Export BQ Data to CSV, replace filenames and upload to cloud storage bucket
-prepare_data.bq_to_csv(
+csv_uris = prepare_data.bq_to_csv(
     consts.PROJECT_ID, consts.DATASET_ID, consts.INPUT_BUCKET, consts.OUTPUT_BUCKET)
 
-# # Convert all PDFs in input bucket to PNGs in output bucket
+# Convert all PDFs in input bucket to PNGs in output bucket
 prepare_data.convert_pdfs(
     consts.INPUT_BUCKET, consts.OUTPUT_BUCKET, consts.TEMP_DIRECTORY)
 
@@ -33,7 +33,6 @@ dataset_metadata = {
     }
 }
 
-# TODO run for each csv
-path = "gs://pdf-processing-219114-vcm/holt/entity_extraction.csv"
-init_automl.create_dataset(
-    consts.PROJECT_ID, consts.REGION, dataset_metadata, path)
+for path in csv_uris:
+    init_automl.create_dataset(
+        consts.PROJECT_ID, consts.REGION, dataset_metadata, path)
