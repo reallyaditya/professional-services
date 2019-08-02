@@ -6,5 +6,6 @@ google-auth-httplib2
 google-cloud-automl
 google-cloud-storage
 google-cloud-bigquery
+numpy
 pandas
 wand
