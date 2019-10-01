@@ -137,7 +137,7 @@ class MatchApplicant(MatchFunction):
 def convert_pdfs(main_project_id,
                  input_bucket_name,
                  service_acct,
-                 output_directory="patent_demo_data",
+                 output_directory="news_demo_data",
                  temp_directory="./tmp/google"):
   """Converts all pdfs in a bucket to png and txt using OCR.
 
@@ -190,7 +190,7 @@ def image_classification(main_project_id,
                          service_acct,
                          input_bucket_name,
                          region,
-                         output_directory="patent_demo_data"):
+                         output_directory="news_demo_data"):
   """Create AutoML model for image classification."""
 
   logger.info(f"Beginning AutoML image classification process.")
@@ -239,7 +239,7 @@ def object_detection(main_project_id,
                      service_acct,
                      input_bucket_name,
                      region,
-                     output_directory="patent_demo_data"):
+                     output_directory="news_demo_data"):
   """Create AutoML model for object detection."""
   logger.info(f"Beginning AutoML object detection process.")
 
@@ -290,7 +290,7 @@ def text_classification(main_project_id,
                         service_acct,
                         input_bucket_name,
                         region,
-                        output_directory="patent_demo_data"):
+                        output_directory="news_demo_data"):
   """Create AutoML model for text classification. """
   logger.info(f"Starting AutoML text classification.")
 
@@ -343,7 +343,7 @@ def entity_extraction(main_project_id,
                       input_bucket_name,
                       region,
                       config,
-                      output_directory="patent_demo_data",
+                      output_directory="news_demo_data",
                       temp_directory = "./tmp/google"):
   """Create AutoML entity extraction model."""
   logger.info(f"Starting AutoML entity extraction.")
